@@ -1,4 +1,4 @@
-G W
+D W
 A B 1
 C D 2
 D A 3
