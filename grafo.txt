@@ -1,5 +1,5 @@
-D W
-A B 1
-C D 2
-D A 3
-B C 4
+G N
+A B
+C D
+A C
+B D

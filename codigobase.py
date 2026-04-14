@@ -103,7 +103,6 @@ def visualizar_grafo(G, ponderado=False):
         labels = nx.get_edge_attributes(G, "weight")
         nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
 
-    plt.title("Visualização do Grafo")
     plt.savefig("visualizacao_grafo.png")
 
 
@@ -178,6 +177,74 @@ def get_edge_weight(G, edges):
     return 1
 
 
+def graph_dfs_rec(
+    G: nx.Graph | nx.DiGraph,
+    start_node,
+    destination_node,
+    max_depth: int,
+    depth: int,
+    possible_paths: list,
+    possible_trails: list,
+    path: list = None,
+    trail: list[frozenset] = None,
+):
+    path.append(start_node)
+    print(f"Visitando nodo {start_node}, profundidade {depth}...")
+    print(f"Caminho atual: {path}")
+
+    if start_node == destination_node:
+        possible_paths.append(list(path))
+
+        possible_trails.append(list(trail))
+
+    if depth >= max_depth:
+        path.pop()
+        print(
+            f"Profundidade máxima {max_depth} atingida em nodo {start_node}, retornando..."
+        )
+        return
+
+    for neighbor in G.neighbors(start_node):
+        edge = frozenset({start_node, neighbor})
+        if edge not in trail:
+            trail.append(edge)
+            graph_dfs_rec(
+                G,
+                start_node=neighbor,
+                destination_node=destination_node,
+                depth=depth + 1,
+                max_depth=max_depth,
+                possible_paths=possible_paths,
+                possible_trails=possible_trails,
+                path=path,
+                trail=trail,
+            )
+            trail.pop()
+
+    path.pop()
+    print(f"Retornando do nodo {start_node}, caminho atual: {path}")
+    return
+
+
+def graph_dfs(G, start_node, destination_node, max_depth):
+    possible_paths = []
+    possible_trails = []
+    graph_dfs_rec(
+        G=G,
+        start_node=start_node,
+        destination_node=destination_node,
+        max_depth=max_depth,
+        depth=0,
+        possible_paths=possible_paths,
+        possible_trails=possible_trails,
+        path=[],
+        trail=[],
+    )
+    formated = [[tuple(sorted(edge)) for edge in trail] for trail in possible_trails]
+
+    return possible_paths, formated
+
+
 def print_matrix(matrix):
     """Imprime uma matriz de forma legível."""
     if isinstance(matrix, dict):
@@ -215,13 +282,21 @@ if __name__ == "__main__":
     # Adicionar aresta manualmente
     #    adicionar_aresta(G, "E", "A")
 
-    # Visualizar grafo
     visualizar_grafo(G, ponderado)
-    print("Matriz de Adjacência:")
-    print_matrix(graph_to_adjacency_matrix(G))
+    # print("Matriz de Adjacência:")
+    # print_matrix(graph_to_adjacency_matrix(G))
 
-    print("Matriz de Incidência:")
-    print_matrix(graph_to_incidence_matrix(G))
+    # print("Matriz de Incidência:")
+    # print_matrix(graph_to_incidence_matrix(G))
 
-    print("Lista de Adjacências:")
-    print_matrix(graph_to_adjacent_list(G))
+    # print("Lista de Adjacências:")
+    # print_matrix(graph_to_adjacent_list(G))
+
+    print("Busca em Profundidade (DFS) de A para D, profundidade máxima 3:")
+    paths, trails = graph_dfs(G, "A", "A", 4)
+    print("Caminhos encontrados:")
+    for path in paths:
+        print(path)
+    print("Trilhas encontradas:")
+    for trail in trails:
+        print(trail)
