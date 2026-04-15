@@ -1,0 +1,201 @@
+import networkx as nx
+
+
+def graph_to_adjacency_matrix(G: nx.Graph | nx.DiGraph):
+    """Converte um grafo para sua matriz de adjacência."""
+
+    matrix = []
+    nodes_list = list(G.nodes())
+    number_of_nodes = len(nodes_list)
+    for i in range(number_of_nodes):
+        row = []
+        for j in range(number_of_nodes):
+            if G.has_edge(nodes_list[i], nodes_list[j]):
+                row.append(get_edge_weight(G, (nodes_list[i], nodes_list[j])))
+            else:
+                row.append(0)
+        matrix.append(row)
+    return matrix
+
+
+def graph_to_incidence_matrix(G):
+    """Converte um grafo para sua matriz de incidência."""
+    edges_list = list(G.edges())
+    nodes_list = list(G.nodes())
+    matrix = []
+
+    for node in nodes_list:
+        row = []
+        for u, v in edges_list:
+            if isinstance(G, nx.DiGraph):
+                if node == u:
+                    row.append(-1)
+                elif node == v:
+                    row.append(1)
+                else:
+                    row.append(0)
+            else:
+                if node == u or node == v:
+                    row.append(1)
+                else:
+                    row.append(0)
+        matrix.append(row)
+
+    return matrix
+
+
+def graph_to_adjacent_list(G: nx.Graph | nx.DiGraph):
+    """Converte um grafo para sua lista de adjacências."""
+    adj = {}
+    nodes_list = list(G.nodes())
+    for node in nodes_list:
+        adj[node] = []
+        for node2 in nodes_list:
+            if node == node2:
+                continue
+            if G.has_edge(node, node2):
+                adj[node].append(node2)
+
+    return adj
+
+
+def has_node_in_edge(edges, node):
+    """Verifica se um nó está presente em alguma aresta do grafo."""
+    return node in edges
+
+
+def get_edge_weight(G, edges):
+    """Retorna o peso da aresta, se existir. Nome corrigido."""
+    u, v = edges
+    if G.has_edge(u, v):
+        return G[u][v].get("weight", 1)
+    return 1
+
+
+def _graph_dfs_rec(
+    G: nx.Graph | nx.DiGraph,
+    start_node,
+    destination_node,
+    max_depth: int,
+    depth: int,
+    possible_paths: list,
+    path: list = None,
+):
+    """
+    Função recursiva para encontrar caminhos sem repetição de vértices.
+    """
+    if path is None:
+        path = []
+
+    path.append(start_node)
+
+    if start_node == destination_node:
+        possible_paths.append(list(path))
+        path.pop()
+        return
+
+    if depth < max_depth:
+        for neighbor in G.neighbors(start_node):
+            if neighbor not in path:
+                _graph_dfs_rec(
+                    G,
+                    neighbor,
+                    destination_node,
+                    max_depth,
+                    depth + 1,
+                    possible_paths,
+                    path,
+                )
+
+    path.pop()
+
+
+def graph_dfs(G, start_node, destination_node, max_depth):
+    """
+    Encontra e exibe todos os caminhos de u até v com comprimento <= k.
+    Retorna o número total de caminhos (trilhas simples) encontrados.
+    """
+    possible_paths = []
+    _graph_dfs_rec(
+        G=G,
+        start_node=start_node,
+        destination_node=destination_node,
+        max_depth=max_depth,
+        depth=0,
+        possible_paths=possible_paths,
+        path=[],
+    )
+
+    print(
+        f"\nCaminhos encontrados de '{start_node}' até '{destination_node}' com comprimento máximo {max_depth}):"
+    )
+    for i, p in enumerate(possible_paths, 1):
+        print(f"Caminho {i}: {' -> '.join(p)} (comprimento: {len(p) - 1})")
+
+    if not possible_paths:
+        print("Nenhum caminho encontrado.")
+
+    return len(possible_paths)
+
+
+def print_matrix(matrix):
+    """Imprime uma matriz de forma legível."""
+    if isinstance(matrix, dict):
+        for key, value in matrix.items():
+            print(f"{key}: {value}")
+        return
+
+    for row in matrix:
+        print("|", end="")
+        for column in row:
+            print(column, end="\t")
+
+        print("|")
+
+
+def check_sequence(G: nx.Graph | nx.DiGraph, S: list):
+    """
+    Verifica as propriedades de uma sequência de vértices S no grafo G.
+    """
+    if not S:
+        print("Sequência vazia.")
+        return
+
+    for v in S:
+        if v not in G:
+            print(f"Erro: O vértice '{v}' não existe no grafo.")
+            return
+
+    is_walk = True
+    seen_edges = []
+    is_directed = isinstance(G, nx.DiGraph)
+
+    for i in range(len(S) - 1):
+        u, v = S[i], S[i + 1]
+        if not G.has_edge(u, v):
+            is_walk = False
+            break
+        if is_directed:
+            edge = (u, v)
+        else:
+            edge = tuple(sorted((u, v)))
+        seen_edges.append(edge)
+
+    if not is_walk:
+        print(f"A sequência {S}:")
+        print(
+            "- Não é um passeio válido sequência de vertices não está presente em todas as arestas."
+        )
+        return
+
+    is_path = len(set(S)) == len(S)
+
+    is_trail = len(set(seen_edges)) == len(seen_edges)
+
+    is_circuit = is_trail and S[0] == S[-1] and len(S) > 1
+
+    print(f"A sequência {S}:")
+    print("- É um passeio válido: Sim")
+    print(f"- É um caminho (sem repetição de vértices): {'Sim' if is_path else 'Não'}")
+    print(f"- É uma trilha (sem repetição de arestas): {'Sim' if is_trail else 'Não'}")
+    print(f"- É um circuito (trilha fechada): {'Sim' if is_circuit else 'Não'}")

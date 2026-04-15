@@ -1,5 +1,6 @@
-G N
+D N
 A B
 C D
 A C
 B D
+C B
