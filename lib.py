@@ -199,3 +199,46 @@ def check_sequence(G: nx.Graph | nx.DiGraph, S: list):
     print(f"- É um caminho (sem repetição de vértices): {'Sim' if is_path else 'Não'}")
     print(f"- É uma trilha (sem repetição de arestas): {'Sim' if is_trail else 'Não'}")
     print(f"- É um circuito (trilha fechada): {'Sim' if is_circuit else 'Não'}")
+
+
+
+def check_dfs_order(G: nx.DiGraph):
+    """Verifica a ordem de visitação dos vértices em uma busca em profundidade (DFS)."""
+    visited = []
+    sequence = []
+    nodes = list(G.nodes())[0]
+    def dfs(node):
+        visited.append(node)
+        for neighbor in G.neighbors(node):
+            if neighbor not in visited:
+                dfs(neighbor)
+        sequence.append(node)
+        return sequence
+    
+    return dfs(nodes)
+
+
+def transposed_matrix(matrix):
+    """Transpõe uma matriz, convertendo linhas em colunas e vice-versa.
+    """
+    n = []
+
+    for i in range(len(matrix[0])):
+        row = []
+        for j in range(len(matrix)):
+            row.append(matrix[j][i])
+        n.append(row)
+
+    return n
+
+def create_reversed_digraph(G: nx.DiGraph, matrix):
+    """Cria o dígrafo reverso de um dígrafo dado."""
+    n_graph = nx.DiGraph()
+    nodes_list = list(G.nodes())
+
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            if matrix[i][j] != 0:
+                n_graph.add_edge(nodes_list[j], nodes_list[i])
+
+    return n_graph

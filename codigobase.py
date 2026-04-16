@@ -125,15 +125,15 @@ if __name__ == "__main__":
 
     visualizar_grafo(G, ponderado)
 
-    print("\nBusca em Profundidade (DFS) de A até C, comprimento máximo 4:")
-    total_caminhos = lib.graph_dfs(G, "A", "C", 4)
-    print(f"Total de caminhos encontrados: {total_caminhos}")
+    print(lib.check_dfs_order(G))
+    matrix =  lib.graph_to_adjacency_matrix(G)
+    print("Adjaceny Matrix:")
+    for row in matrix:
+        print(row)
 
-    print("\nVerificando sequências de vértices:")
-    lib.check_sequence(G, ["A", "B", "D"])
+
+    print("\nAdjacency Matrix (using lib.matrix_t):")
+    for row in lib.matrix_t(matrix):
+        print(row)
+
     print()
-    lib.check_sequence(G, ["A", "C", "B", "D"])
-    print()
-    lib.check_sequence(G, ["A", "B", "A"])
-    print()
-    lib.check_sequence(G, ["A", "D"])
