@@ -203,7 +203,7 @@ def check_sequence(G: nx.Graph | nx.DiGraph, S: list):
 
 def get_dfs_order(G: nx.DiGraph):
     """
-    Executa uma busca em profundidade (DFS) em todo o grafo e retorna os nós em ordem de fim.
+    Executa uma busca em profundidade em todo o grafo e retorna os nós em ordem de fim.
     Variáveis Usadas:
     - visited: Set para rastrear os nós já visitados e evitar ciclos infinitos.
     - stack: Lista que armazena os nós na ordem em que terminam sua exploração
@@ -227,11 +227,15 @@ def get_dfs_order(G: nx.DiGraph):
 
 def find_sccs_kosaraju(G: nx.DiGraph):
     """
-    Implementa o algoritmo de Kosaraju-Sharir para identificar Componentes Fortemente Conectadas (SCCs).
+    Implementa o algoritmo de Kosaraju-Sharir para identificar componentes fortemente conexos (SCCs).
     - Pega a ordem de término dos nós usando a funcão get_dfs_post_order.
     - Transpõe o grafo para obter o grafo reverso.
     - Realiza uma DFS no grafo reverso seguindo a ordem inversa de término para coletar os nós de cada SCC.
-
+    Variáveis Utilizadas:
+    - visited: Set para rastrear os nós já visitados e evitar ciclos infinitos.
+    - order_stack: Lista que armazena os nós na ordem em que terminam sua exploração
+    - G_rev: grafo invertido
+    - sccs: Lista de componentes fortemente conexos
     """
     order_stack = get_dfs_order(G)
 
