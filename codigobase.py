@@ -125,15 +125,15 @@ if __name__ == "__main__":
 
     visualizar_grafo(G, ponderado)
 
-    print(lib.check_dfs_order(G))
-    matrix =  lib.graph_to_adjacency_matrix(G)
-    print("Adjaceny Matrix:")
-    for row in matrix:
-        print(row)
+    if isinstance(G, nx.DiGraph):
+        print("\n" + "=" * 50)
+        print("busca de sccs")
+        print("Algoritmo Escolhido: Kosaraju-Sharir")
+        print("=" * 50)
 
+        sccs = lib.find_sccs_kosaraju(G)
 
-    print("\nAdjacency Matrix (using lib.matrix_t):")
-    for row in lib.matrix_t(matrix):
-        print(row)
-
-    print()
+        print(f"Total de SCCs encontrados: {len(sccs)}")
+        for i, scc in enumerate(sccs, 1):
+            print(f"SCC {i}: {', '.join(sorted(scc))}")
+        print("=" * 50 + "\n")

@@ -201,44 +201,58 @@ def check_sequence(G: nx.Graph | nx.DiGraph, S: list):
     print(f"- É um circuito (trilha fechada): {'Sim' if is_circuit else 'Não'}")
 
 
+def get_dfs_order(G: nx.DiGraph):
+    """
+    Executa uma busca em profundidade (DFS) em todo o grafo e retorna os nós em ordem de fim.
+    Variáveis Usadas:
+    - visited: Set para rastrear os nós já visitados e evitar ciclos infinitos.
+    - stack: Lista que armazena os nós na ordem em que terminam sua exploração
+    """
+    visited = set()
+    stack = []
 
-def check_dfs_order(G: nx.DiGraph):
-    """Verifica a ordem de visitação dos vértices em uma busca em profundidade (DFS)."""
-    visited = []
-    sequence = []
-    nodes = list(G.nodes())[0]
     def dfs(node):
-        visited.append(node)
+        visited.add(node)
         for neighbor in G.neighbors(node):
             if neighbor not in visited:
                 dfs(neighbor)
-        sequence.append(node)
-        return sequence
-    
-    return dfs(nodes)
+        stack.append(node)
+
+    for node in G.nodes():
+        if node not in visited:
+            dfs(node)
+
+    return stack
 
 
-def transposed_matrix(matrix):
-    """Transpõe uma matriz, convertendo linhas em colunas e vice-versa.
+def find_sccs_kosaraju(G: nx.DiGraph):
     """
-    n = []
+    Implementa o algoritmo de Kosaraju-Sharir para identificar Componentes Fortemente Conectadas (SCCs).
+    - Pega a ordem de término dos nós usando a funcão get_dfs_post_order.
+    - Transpõe o grafo para obter o grafo reverso.
+    - Realiza uma DFS no grafo reverso seguindo a ordem inversa de término para coletar os nós de cada SCC.
 
-    for i in range(len(matrix[0])):
-        row = []
-        for j in range(len(matrix)):
-            row.append(matrix[j][i])
-        n.append(row)
+    """
+    order_stack = get_dfs_order(G)
 
-    return n
+    G_rev = G.reverse(copy=True)
 
-def create_reversed_digraph(G: nx.DiGraph, matrix):
-    """Cria o dígrafo reverso de um dígrafo dado."""
-    n_graph = nx.DiGraph()
-    nodes_list = list(G.nodes())
+    visited = set()
+    sccs = []
 
-    for i in range(len(matrix)):
-        for j in range(len(matrix[0])):
-            if matrix[i][j] != 0:
-                n_graph.add_edge(nodes_list[j], nodes_list[i])
+    def dfs_collect_scc(node, current_scc):
+        """Função auxiliar para coletar todos os nós alcancaveis em um grafo"""
+        visited.add(node)
+        current_scc.append(node)
+        for neighbor in G_rev.neighbors(node):
+            if neighbor not in visited:
+                dfs_collect_scc(neighbor, current_scc)
 
-    return n_graph
+    while order_stack:
+        node = order_stack.pop()
+        if node not in visited:
+            scc = []
+            dfs_collect_scc(node, scc)
+            sccs.append(scc)
+
+    return sccs
