@@ -212,13 +212,20 @@ def get_dfs_order(G: nx.DiGraph):
     stack = []
 
     def dfs(node):
+        """
+        Visitando nós do grafo
+        """
         visited.add(node)
+
         for neighbor in G.neighbors(node):
             if neighbor not in visited:
                 dfs(neighbor)
         stack.append(node)
 
     for node in G.nodes():
+        """
+        Entra na recusão apenas em nós não visitados, evitando ciclos sem fim
+        """
         if node not in visited:
             dfs(node)
 
@@ -245,7 +252,7 @@ def find_sccs_kosaraju(G: nx.DiGraph):
     sccs = []
 
     def dfs_collect_scc(node, current_scc):
-        """Função auxiliar para coletar todos os nós alcancaveis em um grafo"""
+        """Função auxiliar para coletar todos os nós alcancaveis em um grafo, entra apenas em nós não visitados para evitar ciclos sem fim"""
         visited.add(node)
         current_scc.append(node)
         for neighbor in G_rev.neighbors(node):
@@ -253,6 +260,9 @@ def find_sccs_kosaraju(G: nx.DiGraph):
                 dfs_collect_scc(neighbor, current_scc)
 
     while order_stack:
+        """
+            Visitando nós e verificando os componentes conexos
+        """
         node = order_stack.pop()
         if node not in visited:
             scc = []
