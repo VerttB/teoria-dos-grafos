@@ -123,17 +123,13 @@ if __name__ == "__main__":
         print("Nenhum grafo carregado. Encerrando.")
         exit(1)
 
-    visualizar_grafo(G, ponderado)
+    # visualizar_grafo(G, ponderado)
+    print("DIJKSTRA")
+    visualizar_grafo(G, ponderado)  # Visualizar o dígrafo invertido
+    a = lib.djisktra_shortest_path(G, "A", "F") # Exemplo de caminho mais curto usando Dijkstra
+    print(f"Caminho mais curto de A para F: {a}")
 
-    if isinstance(G, nx.DiGraph):
-        print("\n" + "=" * 50)
-        print("busca de sccs")
-        print("Algoritmo Escolhido: Kosaraju-Sharir")
-        print("=" * 50)
+    print("BELMMAN FORD")
+    b = lib.bellman_ford_shortest_path(G, "A", "F") # Exemplo de caminho mais curto usando Bellman-Ford
+    print(f"Caminho mais curto de A para F: {b}")
 
-        sccs = lib.find_sccs_kosaraju(G)
-
-        print(f"Total de SCCs encontrados: {len(sccs)}")
-        for i, scc in enumerate(sccs, 1):
-            print(f"SCC {i}: {', '.join(sorted(scc))}")
-        print("=" * 50 + "\n")

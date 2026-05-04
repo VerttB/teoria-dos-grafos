@@ -270,3 +270,52 @@ def find_sccs_kosaraju(G: nx.DiGraph):
             sccs.append(scc)
 
     return sccs
+
+
+def djisktra_shortest_path(G: nx.Graph | nx.DiGraph, start_node, end_node):
+    """Encontra o caminho mais curto entre start_node e end_node usando o algoritmo de Dijkstra."""
+    distances = {node: float("inf") for node in G.nodes()}
+    parents = {node: None for node in G.nodes()}
+    distances[start_node] = 0
+    queue = [(0, start_node)]
+    while queue:
+        distance, node = queue.pop()
+        
+        for neighbor in G.neighbors(node):
+            weight = get_edge_weight(G, (node, neighbor))
+            
+            new_distance = distance + weight
+            if new_distance < distances[neighbor]:
+                distances[neighbor] = new_distance
+                queue.append((new_distance, neighbor))
+                parents[neighbor] = node
+        queue.sort()
+    path = []
+    print("Parentes e sua chave", parents, parents.keys())
+    for node in list(parents.keys()):
+        if node == end_node:
+            while node is not None:
+                path.append(node)
+                node = parents[node]
+            path.reverse()
+            print(f"Caminho mais curto de '{start_node}' para '{end_node}': {' -> '.join(path)}")
+
+    return  distances[end_node]
+
+
+def bellman_ford_shortest_path(G: nx.Graph | nx.DiGraph, start_node, end_node):
+    distances = {node: float("inf") for node in G.nodes()}
+    parents = {node: None for node in G.nodes()}
+    distances[start_node] = 0
+    queue = [(0, start_node)]
+    for i in range (len(G.nodes()) - 1):
+        for u,v in G.edges():
+            weight = get_edge_weight(G, (u, v))
+            if distances[u] + weight < distances[v]:
+                if i == len(G.nodes()) - 2:
+                    return [-1]
+                
+                distances[v] = distances[u] + weight
+                parents[v] = u
+
+    return distances[end_node]
