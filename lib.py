@@ -280,16 +280,20 @@ def djisktra_shortest_path(G: nx.Graph | nx.DiGraph, start_node, end_node):
     queue = [(0, start_node)]
     while queue:
         distance, node = queue.pop()
-        
+
         for neighbor in G.neighbors(node):
             weight = get_edge_weight(G, (node, neighbor))
-            
+            if weight < 0:
+                print(
+                    "Erro: O algoritmo de Dijkstra não suporta arestas com peso negativo."
+                )
+                return None
             new_distance = distance + weight
             if new_distance < distances[neighbor]:
                 distances[neighbor] = new_distance
                 queue.append((new_distance, neighbor))
                 parents[neighbor] = node
-        queue.sort()
+        queue.sort(reverse=True)  # Ordena para pegar o menor primeiro
     path = []
     print("Parentes e sua chave", parents, parents.keys())
     for node in list(parents.keys()):
@@ -298,9 +302,11 @@ def djisktra_shortest_path(G: nx.Graph | nx.DiGraph, start_node, end_node):
                 path.append(node)
                 node = parents[node]
             path.reverse()
-            print(f"Caminho mais curto de '{start_node}' para '{end_node}': {' -> '.join(path)}")
+            print(
+                f"Caminho mais curto de '{start_node}' para '{end_node}': {' -> '.join(path)}"
+            )
 
-    return  distances[end_node]
+    return distances[end_node]
 
 
 def bellman_ford_shortest_path(G: nx.Graph | nx.DiGraph, start_node, end_node):
@@ -308,13 +314,13 @@ def bellman_ford_shortest_path(G: nx.Graph | nx.DiGraph, start_node, end_node):
     parents = {node: None for node in G.nodes()}
     distances[start_node] = 0
     queue = [(0, start_node)]
-    for i in range (len(G.nodes()) - 1):
-        for u,v in G.edges():
+    for i in range(len(G.nodes()) - 1):
+        for u, v in G.edges():
             weight = get_edge_weight(G, (u, v))
             if distances[u] + weight < distances[v]:
                 if i == len(G.nodes()) - 2:
                     return [-1]
-                
+
                 distances[v] = distances[u] + weight
                 parents[v] = u
 
