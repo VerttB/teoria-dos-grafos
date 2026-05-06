@@ -123,13 +123,16 @@ if __name__ == "__main__":
         print("Nenhum grafo carregado. Encerrando.")
         exit(1)
 
-    # visualizar_grafo(G, ponderado)
-    print("DIJKSTRA")
-    visualizar_grafo(G, ponderado)  # Visualizar o dígrafo invertido
-    a = lib.djisktra_shortest_path(G, "A", "F") # Exemplo de caminho mais curto usando Dijkstra
-    print(f"Caminho mais curto de A para F: {a}")
+    visualizar_grafo(G, ponderado)
 
-    print("BELMMAN FORD")
-    b = lib.bellman_ford_shortest_path(G, "A", "F") # Exemplo de caminho mais curto usando Bellman-Ford
-    print(f"Caminho mais curto de A para F: {b}")
+    start = input("Qual o vértice de origem? ").upper()
+    end = input("Qual o vértice de destino? ").upper()
+    a = lib.djisktra_shortest_path(
+        G, start, end
+    )  # Exemplo de caminho mais curto usando Dijkstra
+    print(f"Caminho mais curto de {start} para {end}: {a}")
 
+    b = lib.bellman_ford_shortest_path(
+        G, start, end
+    )  # Exemplo de caminho mais curto usando Bellman-Ford
+    print(f"Caminho mais curto de {start} para {end}: {b}")

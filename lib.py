@@ -274,6 +274,7 @@ def find_sccs_kosaraju(G: nx.DiGraph):
 
 def djisktra_shortest_path(G: nx.Graph | nx.DiGraph, start_node, end_node):
     """Encontra o caminho mais curto entre start_node e end_node usando o algoritmo de Dijkstra."""
+    print("Running Dijkstra's algorithm...")
     distances = {node: float("inf") for node in G.nodes()}
     parents = {node: None for node in G.nodes()}
     distances[start_node] = 0
@@ -295,21 +296,20 @@ def djisktra_shortest_path(G: nx.Graph | nx.DiGraph, start_node, end_node):
                 parents[neighbor] = node
         queue.sort(reverse=True)  # Ordena para pegar o menor primeiro
     path = []
-    print("Parentes e sua chave", parents, parents.keys())
-    for node in list(parents.keys()):
-        if node == end_node:
-            while node is not None:
-                path.append(node)
-                node = parents[node]
-            path.reverse()
-            print(
-                f"Caminho mais curto de '{start_node}' para '{end_node}': {' -> '.join(path)}"
-            )
 
+    if parents[end_node] is None and end_node != start_node:
+        print(f"Erro: O nó '{end_node}' não é alcançável a partir de '{start_node}'.")
+        return None
+
+    path = build_path(parents, end_node)
+    print(
+        f"Caminho mais curto de '{start_node}' para '{end_node}': {' -> '.join(path)}"
+    )
     return distances[end_node]
 
 
 def bellman_ford_shortest_path(G: nx.Graph | nx.DiGraph, start_node, end_node):
+    print("Running Bellman-Ford algorithm...")
     distances = {node: float("inf") for node in G.nodes()}
     parents = {node: None for node in G.nodes()}
     distances[start_node] = 0
@@ -324,4 +324,19 @@ def bellman_ford_shortest_path(G: nx.Graph | nx.DiGraph, start_node, end_node):
                 distances[v] = distances[u] + weight
                 parents[v] = u
 
+    if parents[end_node] is None and end_node != start_node:
+        print(f"Erro: O nó '{end_node}' não é alcançável a partir de '{start_node}'.")
+        return None
+
+    build_path(parents, end_node)
+
     return distances[end_node]
+
+
+def build_path(parents, end_node):
+    path = []
+    while end_node is not None:
+        path.append(end_node)
+        end_node = parents[end_node]
+    path.reverse()
+    return path
