@@ -1,0 +1,5 @@
+G W
+A B 3
+B C 4
+D E 2
+E F 5

@@ -1,32 +1,82 @@
-import networkx as nx
+from pathlib import Path
+
+import matplotlib
+
+matplotlib.use("Agg")
+
 import matplotlib.pyplot as plt
-import os
+import networkx as nx
+
 import lib
+
+
+ENTRADAS_DIR = Path(__file__).resolve().parent / "entradas"
+
+
+def listar_arquivos_entrada(pasta=ENTRADAS_DIR):
+    """Retorna os arquivos .txt disponiveis na pasta de entradas."""
+    if not pasta.exists():
+        return []
+
+    return sorted(
+        [
+            arquivo
+            for arquivo in pasta.iterdir()
+            if arquivo.is_file() and arquivo.suffix.lower() == ".txt"
+        ],
+        key=lambda arquivo: arquivo.name.lower(),
+    )
+
+
+def selecionar_arquivo_entrada():
+    """Mostra os arquivos de entrada e permite escolher por numero ou nome."""
+    arquivos = listar_arquivos_entrada()
+
+    if not arquivos:
+        print(f"Nenhum arquivo .txt encontrado em '{ENTRADAS_DIR}'.")
+        return None
+
+    print("\nArquivos de entrada disponiveis:")
+    for indice, arquivo in enumerate(arquivos, start=1):
+        print(f"{indice}. {arquivo.name}")
+
+    while True:
+        escolha = input("\nEscolha o arquivo pelo numero ou nome: ").strip()
+
+        if escolha.isdigit():
+            indice = int(escolha)
+            if 1 <= indice <= len(arquivos):
+                return arquivos[indice - 1]
+
+        for arquivo in arquivos:
+            if escolha.lower() == arquivo.name.lower():
+                return arquivo
+
+        print("Opcao invalida. Tente novamente.")
 
 
 def ler_grafo_arquivo(nome_arquivo):
     """
-    Lê um arquivo de texto e cria um grafo/dígrafo (ponderado ou não).
+    Le um arquivo de texto e cria um grafo/digrafo.
 
     Formato esperado:
-    1ª linha: [G|D] [N|W]
-        G = Grafo não direcionado
-        D = Dígrafo
-        N = Não ponderado
+    1a linha: [G|D] [N|W]
+        G = Grafo nao direcionado
+        D = Digrafo
+        N = Nao ponderado
         W = Ponderado
     Demais linhas:
-        Se não ponderado: u v
+        Se nao ponderado: u v
         Se ponderado:     u v w
     """
     try:
-        with open(nome_arquivo, "r") as f:
-            linhas = [linha.strip() for linha in f if linha.strip()]
+        with open(nome_arquivo, "r", encoding="utf-8") as arquivo:
+            linhas = [linha.strip() for linha in arquivo if linha.strip()]
 
         if not linhas:
             print("Arquivo vazio!")
             return None, False
 
-        # Definição do tipo de grafo
         tipo, peso = linhas[0].split()
         if tipo == "G":
             G = nx.Graph()
@@ -35,9 +85,11 @@ def ler_grafo_arquivo(nome_arquivo):
         else:
             raise ValueError("Primeiro caractere deve ser 'G' ou 'D'.")
 
+        if peso not in {"N", "W"}:
+            raise ValueError("Segundo caractere deve ser 'N' ou 'W'.")
+
         ponderado = peso == "W"
 
-        # Leitura das arestas
         for linha in linhas[1:]:
             partes = linha.split()
             if ponderado:
@@ -48,30 +100,34 @@ def ler_grafo_arquivo(nome_arquivo):
             else:
                 if len(partes) != 2:
                     raise ValueError(
-                        "Esperado formato 'u v' para grafos não ponderados."
+                        "Esperado formato 'u v' para grafos nao ponderados."
                     )
                 u, v = partes
-                adicionar_aresta(G, u, v, ponderado)  # peso padrão 1
+                adicionar_aresta(G, u, v)
 
         print(
-            f"Grafo criado ({'dígrafo' if tipo == 'D' else 'grafo'}, "
-            f"{'ponderado' if ponderado else 'não ponderado'}) com "
-            f"{G.number_of_nodes()} vértices e {G.number_of_edges()} arestas."
+            f"Grafo criado ({'digrafo' if tipo == 'D' else 'grafo'}, "
+            f"{'ponderado' if ponderado else 'nao ponderado'}) com "
+            f"{G.number_of_nodes()} vertices e {G.number_of_edges()} arestas. \n"
+            f"Vértices: {list(G.nodes())}"
         )
         return G, ponderado
 
     except FileNotFoundError:
-        print(f"Arquivo '{nome_arquivo}' não encontrado.")
+        print(f"Arquivo '{nome_arquivo}' nao encontrado.")
+        return None, False
+    except ValueError as erro:
+        print(f"Erro no arquivo '{nome_arquivo}': {erro}")
         return None, False
 
 
 def adicionar_vertice(G, v):
-    """Adiciona um vértice ao grafo, se não existir."""
+    """Adiciona um vertice ao grafo, se nao existir."""
     if v not in G:
         G.add_node(v)
-        print(f"Vértice '{v}' adicionado.")
+        print(f"Vertice '{v}' adicionado.")
     else:
-        print(f"Vértice '{v}' já existe.")
+        print(f"Vertice '{v}' ja existe.")
 
 
 def adicionar_aresta(G, u, v, w=1, ponderado=False):
@@ -85,38 +141,36 @@ def adicionar_aresta(G, u, v, w=1, ponderado=False):
 
 
 def visualizar_grafo(G, ponderado=False):
-    """Desenha o grafo (ou dígrafo) com ou sem pesos."""
+    """Desenha o grafo em um arquivo PNG."""
     pos = nx.spring_layout(G)
-    nx.draw(
-        G,
-        pos,
-        with_labels=True,
-        node_color="lightblue",
-        edge_color="black",
-        node_size=1000,
-        font_size=12,
-        arrows=isinstance(G, nx.DiGraph),
-        arrowsize=20,
-    )
+    desenho = {
+        "with_labels": True,
+        "node_color": "lightblue",
+        "edge_color": "black",
+        "node_size": 1000,
+        "font_size": 12,
+        "arrows": isinstance(G, nx.DiGraph),
+    }
 
-    # Se for ponderado, mostrar pesos
+    if isinstance(G, nx.DiGraph):
+        desenho["arrowsize"] = 20
+
+    nx.draw(G, pos, **desenho)
+
     if ponderado:
         labels = nx.get_edge_attributes(G, "weight")
         nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
 
     plt.savefig("visualizacao_grafo.png")
+    plt.close()
 
 
-# -------------------------------
-# Exemplo de uso do programa
-# -------------------------------
 if __name__ == "__main__":
-    # Ler grafo a partir de arquivo
-    system_dir = "/home/massa/codigosPython/TGrafos/base_grafos/"
-    nome_arquivo = "grafo.txt"  # Arquivo de entrada
-    file = os.path.join(system_dir, nome_arquivo)
-    # usar caminho completo se existir, caso contrário tentar arquivo local
-    path = file if os.path.exists(file) else nome_arquivo
+    path = selecionar_arquivo_entrada()
+    if path is None:
+        exit(1)
+
+    print(f"\nArquivo lido: {path.name}")
     G, ponderado = ler_grafo_arquivo(path)
 
     if G is None:
@@ -125,14 +179,11 @@ if __name__ == "__main__":
 
     visualizar_grafo(G, ponderado)
 
-    start = input("Qual o vértice de origem? ").upper()
-    end = input("Qual o vértice de destino? ").upper()
-    a = lib.djisktra_shortest_path(
-        G, start, end
-    )  # Exemplo de caminho mais curto usando Dijkstra
-    print(f"Caminho mais curto de {start} para {end}: {a}")
+    start = input("Qual o vertice de origem? ").strip().upper()
+    end = input("Qual o vertice de destino? ").strip().upper()
 
-    b = lib.bellman_ford_shortest_path(
-        G, start, end
-    )  # Exemplo de caminho mais curto usando Bellman-Ford
-    print(f"Caminho mais curto de {start} para {end}: {b}")
+    dijkstra = lib.djisktra_shortest_path(G, start, end)
+    print(f"Caminho mais curto de {start} para {end}: {dijkstra}")
+
+    bellman_ford = lib.bellman_ford_shortest_path(G, start, end)
+    print(f"Caminho mais curto de {start} para {end}: {bellman_ford}")
