@@ -160,7 +160,7 @@ def visualizar_grafo(G, ponderado=False):
         labels = nx.get_edge_attributes(G, "weight")
         nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
 
-    plt.savefig("visualizacao_grafo.png")
+    plt.savefig("visualizacao_grafo1.png")
     plt.close()
 
 
@@ -177,10 +177,11 @@ if __name__ == "__main__":
         exit(1)
 
     visualizar_grafo(G, ponderado)
-
-    start = input("Qual o vertice de origem? ").strip().upper()
-    end = input("Qual o vertice de destino? ").strip().upper()
-    dijkstra = lib.djisktra_shortest_path(G, start, end)
-    print(f"Caminho mais curto de {start} para {end}: {dijkstra}")
-    bellman_ford = lib.bellman_ford_shortest_path(G, start, end)
-    print(f"Caminho mais curto de {start} para {end}: {bellman_ford}")
+    mst = lib.kruskal_mst(G)
+    print(f"Árvore Geradora Mínima: {mst}")
+    # start = input("Qual o vertice de origem? ").strip().upper()
+    # end = input("Qual o vertice de destino? ").strip().upper()
+    # dijkstra = lib.djisktra_shortest_path(G, start, end)
+    # print(f"Caminho mais curto de {start} para {end}: {dijkstra}")
+    # bellman_ford = lib.bellman_ford_shortest_path(G, start, end)
+    # print(f"Caminho mais curto de {start} para {end}: {bellman_ford}")

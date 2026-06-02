@@ -7,7 +7,7 @@ from . import graph_matrix as _graph_matrix
 from . import graph_traversal as _graph_traversal
 from . import graph_validation as _graph_validation
 from . import shortest_path as _shortest_path
-
+from . import graph_mst as _graph_mst
 
 graph_tools = _types.SimpleNamespace(
     graph_to_adjacency_matrix=_graph_matrix.graph_to_adjacency_matrix,
@@ -24,6 +24,7 @@ graph_tools = _types.SimpleNamespace(
     djisktra_shortest_path=_shortest_path.djisktra_shortest_path,
     bellman_ford_shortest_path=_shortest_path.bellman_ford_shortest_path,
     build_path=_shortest_path.build_path,
+    kruskal_mst=_graph_mst.kruskal_mst
 )
 
 __all__ = ["graph_tools"]
