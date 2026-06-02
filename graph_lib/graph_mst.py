@@ -19,9 +19,6 @@ def kruskal_mst(graph: Graph | DiGraph):
         print("Kruskal requer um grafo ponderado.")
         return None
 
-    if not _is_connected(graph):
-        print("Kruskal requer um grafo conexo para gerar uma MST.")
-        return None
 
     sorted_edges = sorted(list(graph.edges(data=True)), key=lambda x: x[2]["weight"])
     groups = {}
@@ -63,24 +60,6 @@ def _union(groups, node1, node2):
 def _check_cycle(groups, node1, node2):
     """Função auxiliar para verificar se a adição de uma aresta criaria um ciclo."""
     return _find(groups, node1) == _find(groups, node2)
-
-
-def _is_connected(graph):
-    """Função auxiliar para verificar se todos os vértices estão conectados."""
-    visited = set()
-    stack = [next(iter(graph.nodes()))]
-
-    while stack:
-        node = stack.pop()
-        if node in visited:
-            continue
-
-        visited.add(node)
-        stack.extend(
-            neighbor for neighbor in graph.neighbors(node) if neighbor not in visited
-        )
-
-    return len(visited) == graph.number_of_nodes()
 
 
 def _gen_graph_image(graph, mst_path):
