@@ -8,6 +8,7 @@ from . import graph_traversal as _graph_traversal
 from . import graph_validation as _graph_validation
 from . import shortest_path as _shortest_path
 from . import graph_mst as _graph_mst
+from . import graph_planarity as _graph_planarity
 
 graph_tools = _types.SimpleNamespace(
     graph_to_adjacency_matrix=_graph_matrix.graph_to_adjacency_matrix,
@@ -24,7 +25,10 @@ graph_tools = _types.SimpleNamespace(
     djisktra_shortest_path=_shortest_path.djisktra_shortest_path,
     bellman_ford_shortest_path=_shortest_path.bellman_ford_shortest_path,
     build_path=_shortest_path.build_path,
-    kruskal_mst=_graph_mst.kruskal_mst
+    kruskal_mst=_graph_mst.kruskal_mst,
+    test_planarity=_graph_planarity.test_planarity,
+    get_planar_positions=_graph_planarity.get_planar_positions,
+    extract_kuratowski=_graph_planarity.extract_kuratowski,
 )
 
 __all__ = ["graph_tools"]

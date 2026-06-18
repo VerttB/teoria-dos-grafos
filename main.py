@@ -139,12 +139,11 @@ def adicionar_aresta(G, u, v, w=1, ponderado=False):
         print(f"Aresta '{u} - {v}' adicionada.")
 
 
-def visualizar_grafo(G, ponderado=False):
-    """Desenha o grafo em um arquivo PNG."""
-    pos = nx.spring_layout(G)
+def visualizar_grafo_planar(G, pos, ponderado=False):
+    """Desenha o grafo em um arquivo PNG utilizando posições do embedding planar."""
     desenho = {
         "with_labels": True,
-        "node_color": "lightblue",
+        "node_color": "lightgreen",
         "edge_color": "black",
         "node_size": 1000,
         "font_size": 12,
@@ -160,8 +159,11 @@ def visualizar_grafo(G, ponderado=False):
         labels = nx.get_edge_attributes(G, "weight")
         nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
 
-    plt.savefig("visualizacao_grafo1.png")
+    plt.savefig("visualizacao_grafo_planar.png")
     plt.close()
+    print(
+        "Imagem gerada com embedding planar salva como 'visualizacao_grafo_planar.png'."
+    )
 
 
 if __name__ == "__main__":
@@ -176,12 +178,16 @@ if __name__ == "__main__":
         print("Nenhum grafo carregado. Encerrando.")
         exit(1)
 
-    visualizar_grafo(G, ponderado)
-    mst = lib.kruskal_mst(G)
-    print(f"Árvore Geradora Mínima: {mst}")
-    # start = input("Qual o vertice de origem? ").strip().upper()
-    # end = input("Qual o vertice de destino? ").strip().upper()
-    # dijkstra = lib.djisktra_shortest_path(G, start, end)
-    # print(f"Caminho mais curto de {start} para {end}: {dijkstra}")
-    # bellman_ford = lib.bellman_ford_shortest_path(G, start, end)
-    # print(f"Caminho mais curto de {start} para {end}: {bellman_ford}")
+    is_planar, result = lib.test_planarity(G)
+
+    if is_planar:
+        print("\nResultado: O grafo é planar.")
+        print("Resultado da planaridade", result)
+        pos = lib.get_planar_positions(result)
+        visualizar_grafo_planar(G, pos, ponderado)
+    else:
+        print("\nResultado: O grafo NÃO é planar.")
+        vertices, edges = lib.extract_kuratowski(result)
+        print(
+            f"Subgrafo de Kuratowski encontrado: Vértices {vertices}, Arestas {edges}"
+        )
