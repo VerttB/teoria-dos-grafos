@@ -17,5 +17,5 @@ Quando o grafo é planar a função nos retorna uma tupla `[is_planar, embedding
 - **Quando é Planar:**
 Com isso podemos pegar o retorno da função retornado na tupla. Extraímos as coordenadas para desenhar o grafo de forma totalmente planar através da função `nx.combinatorial_embedding_to_pos(embedding)` O grafo é então salvo em uma imagem caso seja planar.
 
-- **Quando NÃO é Planar:**
-Ao recebermos `False` na tupla, capturamos o objeto `Graph` do NetworkX correspondente ao `subgrafo_kuratowski`. Iteramos pelos nós desse objeto gerado para exibir visualmente na tela a lista dos vértices envolvidos que causam o cruzamento e forçam o grafo a ser não planar 
+- **Quando não é Planar:**
+Quando a tupla retorna `False`, capturamos o objeto `Graph` do NetworkX correspondente ao `subgrafo_kuratowski`. Iteramos pelos nós desse objeto gerado para exibir visualmente na tela a lista dos vértices envolvidos que causam o cruzamento e forçam o grafo a ser não planar 
