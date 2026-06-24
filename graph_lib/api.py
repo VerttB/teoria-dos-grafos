@@ -9,6 +9,8 @@ from . import graph_validation as _graph_validation
 from . import shortest_path as _shortest_path
 from . import graph_mst as _graph_mst
 from . import graph_planarity as _graph_planarity
+from . import graph_heuristics as _graph_heuristics
+from . import common as _common
 
 graph_tools = _types.SimpleNamespace(
     graph_to_adjacency_matrix=_graph_matrix.graph_to_adjacency_matrix,
@@ -29,6 +31,14 @@ graph_tools = _types.SimpleNamespace(
     test_planarity=_graph_planarity.test_planarity,
     get_planar_positions=_graph_planarity.get_planar_positions,
     extract_kuratowski=_graph_planarity.extract_kuratowski,
+    heuristica_conjunto_estavel=_graph_heuristics.heuristica_conjunto_estavel,
+    calcular_cobertura_vertices=_graph_heuristics.calcular_cobertura_vertices,
+    calcular_clique=_graph_heuristics.calcular_clique,
+    desenhar_e_salvar_solucao=_graph_heuristics.desenhar_e_salvar_solucao,
+    selecionar_arquivo_entrada=_common.selecionar_arquivo_entrada,
+    ler_grafo_arquivo=_common.ler_grafo_arquivo,
+    adicionar_vertice=_common.adicionar_vertice,
+    adicionar_aresta=_common.adicionar_aresta,
 )
 
 __all__ = ["graph_tools"]
