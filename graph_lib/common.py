@@ -58,55 +58,81 @@ def selecionar_arquivo_entrada(pasta=ENTRADAS_DIR):
 def ler_grafo_arquivo(nome_arquivo):
     """
     Lê um arquivo de texto e cria um grafo/digrafo.
-
-    Formato esperado:
-    1a linha: [G|D] [N|W]
-        G = Grafo nao direcionado
-        D = Digrafo
-        N = Nao ponderado
-        W = Ponderado
-    Demais linhas:
-        Se nao ponderado: u v
-        Se ponderado:     u v w
+    Suporta arquivos com cabeçalho (ex: 'G N', 'G W') ou sem cabeçalho (ex: direto com 'u v w').
     """
     try:
         with open(nome_arquivo, "r", encoding="utf-8") as arquivo:
-            linhas = [linha.strip() for linha in arquivo if linha.strip()]
+            linhas = [
+                linha.strip()
+                for linha in arquivo
+                if linha.strip() and not linha.strip().startswith("#")
+            ]
 
         if not linhas:
             print("Arquivo vazio!")
             return None, False
 
-        tipo, peso = linhas[0].split()
-        if tipo == "G":
-            G = nx.Graph()
-        elif tipo == "D":
-            G = nx.DiGraph()
+        # Verificar se a primeira linha é cabeçalho
+        partes_cabecalho = linhas[0].split()
+        tem_cabecalho = False
+        if len(partes_cabecalho) == 2:
+            tipo_grafo, peso_grafo = partes_cabecalho
+            if tipo_grafo in {"G", "D"} and peso_grafo in {"N", "W"}:
+                tem_cabecalho = True
+
+        if tem_cabecalho:
+            tipo, peso = partes_cabecalho
+            if tipo == "G":
+                G = nx.Graph()
+            elif tipo == "D":
+                G = nx.DiGraph()
+            else:
+                raise ValueError("Primeiro caractere deve ser 'G' ou 'D'.")
+
+            if peso not in {"N", "W"}:
+                raise ValueError("Segundo caractere deve ser 'N' ou 'W'.")
+
+            ponderado = peso == "W"
+            linhas_arestas = linhas[1:]
         else:
-            raise ValueError("Primeiro caractere deve ser 'G' ou 'D'.")
+            G = nx.Graph()
+            ponderado = len(partes_cabecalho) >= 3
+            linhas_arestas = linhas
 
-        if peso not in {"N", "W"}:
-            raise ValueError("Segundo caractere deve ser 'N' ou 'W'.")
-
-        ponderado = peso == "W"
-
-        for linha in linhas[1:]:
+        for num_linha, linha in enumerate(
+            linhas_arestas, start=1 if not tem_cabecalho else 2
+        ):
             partes = linha.split()
+            if not partes:
+                continue
             if ponderado:
-                if len(partes) != 3:
-                    raise ValueError("Esperado formato 'u v w' para grafos ponderados.")
-                u, v, w = partes
+                if len(partes) < 3:
+                    print(
+                        f"Aviso: Linha {num_linha} ignorada devido ao formato inválido (esperado 'u v w'): '{linha}'"
+                    )
+                    continue
+                u, v, w_str = partes[0], partes[1], partes[2]
+                try:
+                    w = float(w_str)
+                    if w.is_integer():
+                        w = int(w)
+                except ValueError:
+                    print(
+                        f"Erro: Peso inválido na linha {num_linha}: '{w_str}'. Usando peso 1.0."
+                    )
+                    w = 1.0
                 adicionar_aresta(G, u, v, w, ponderado)
             else:
-                if len(partes) != 2:
-                    raise ValueError(
-                        "Esperado formato 'u v' para grafos nao ponderados."
+                if len(partes) < 2:
+                    print(
+                        f"Aviso: Linha {num_linha} ignorada devido ao formato inválido (esperado 'u v'): '{linha}'"
                     )
-                u, v = partes
+                    continue
+                u, v = partes[0], partes[1]
                 adicionar_aresta(G, u, v)
 
         print(
-            f"Grafo criado ({'digrafo' if tipo == 'D' else 'grafo'}, "
+            f"Grafo criado ({'digrafo' if isinstance(G, nx.DiGraph) else 'grafo'}, "
             f"{'ponderado' if ponderado else 'nao ponderado'}) com "
             f"{G.number_of_nodes()} vertices e {G.number_of_edges()} arestas. \n"
             f"Vértices: {list(G.nodes())}"

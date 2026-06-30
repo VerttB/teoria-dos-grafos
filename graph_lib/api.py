@@ -11,6 +11,7 @@ from . import graph_mst as _graph_mst
 from . import graph_planarity as _graph_planarity
 from . import graph_heuristics as _graph_heuristics
 from . import common as _common
+from . import hungarian as _hungarian
 
 graph_tools = _types.SimpleNamespace(
     graph_to_adjacency_matrix=_graph_matrix.graph_to_adjacency_matrix,
@@ -39,6 +40,8 @@ graph_tools = _types.SimpleNamespace(
     ler_grafo_arquivo=_common.ler_grafo_arquivo,
     adicionar_vertice=_common.adicionar_vertice,
     adicionar_aresta=_common.adicionar_aresta,
+    resolver_emparelhamento_hungaro=_hungarian.resolver_emparelhamento_hungaro,
+    desenhar_e_salvar_emparelhamento=_hungarian.desenhar_e_salvar_emparelhamento,
 )
 
 __all__ = ["graph_tools"]
