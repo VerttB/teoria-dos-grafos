@@ -1,0 +1,9 @@
+D W
+A C 10
+A D 5
+B D 15
+C E 9
+C F 15
+D F 10
+E Y 10
+F Z 15

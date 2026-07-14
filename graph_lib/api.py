@@ -12,6 +12,7 @@ from . import graph_planarity as _graph_planarity
 from . import graph_heuristics as _graph_heuristics
 from . import common as _common
 from . import hungarian as _hungarian
+from . import ford_fulkerson as _ford_fulkerson
 
 graph_tools = _types.SimpleNamespace(
     graph_to_adjacency_matrix=_graph_matrix.graph_to_adjacency_matrix,
@@ -42,6 +43,8 @@ graph_tools = _types.SimpleNamespace(
     adicionar_aresta=_common.adicionar_aresta,
     resolver_emparelhamento_hungaro=_hungarian.resolver_emparelhamento_hungaro,
     desenhar_e_salvar_emparelhamento=_hungarian.desenhar_e_salvar_emparelhamento,
+    executar_ford_fulkerson=_ford_fulkerson.executar_ford_fulkerson,
+    desenhar_e_salvar_fluxo_maximo=_ford_fulkerson.desenhar_e_salvar_fluxo_maximo,
 )
 
 __all__ = ["graph_tools"]
